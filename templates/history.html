@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <style>
+        /* Basic Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background-image: url("{{ url_for('static', filename='img/homebg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 15px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+        }
+
+        .nav-links ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links ul li {
+            margin-left: 20px;
+        }
+
+        .nav-links ul li a {
+            color: #000;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .nav-links ul li a:hover {
+            color: #007bff;
+        }
+
+        /* Center the wrapper */
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
+            margin: 150px auto; /* Push the content below the navbar */
+            padding: 20px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Scrollable Content */
+        .scrollable-content {
+            max-height: 300px; /* Limit the height */
+            overflow-y: scroll; /* Add vertical scroll */
+        }
+
+        /* List Styling */
+        .scrollable-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .scrollable-content ul li {
+            padding: 10px;
+            background-color: #f5f5f5;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scrollable-content ul li span {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar with Logo and Aligned Links -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+        </a>    
+        <div class="nav-links">
+            <ul>
+                <li class="nav-item">
+                    <a href="{{ url_for('homepage') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="title">Upload History</div>
+        <div class="scrollable-content">
+            {% if upload_history %}
+                <ul>
+                    {% for item in upload_history %}
+                        <li>
+                            <div>
+                                <span>{{ item.file_name }}</span> <!-- Remove the download link -->
+                                <br>
+                                <span>Uploaded on {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No upload history available.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

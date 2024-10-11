@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayOnTrack</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon_sot.png') }}" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            background: #d1d1d1;
+            margin-top: 70px; /* Add this line to create space equal to the navbar height */
+        }
+
+        .navbar {
+            height: 70px; /* Ensure you set a height for the navbar */
+        }
+
+        /* Updated overall retention container to be wider */
+        .overall-retention-container {
+            background: #484848;
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 2.5rem;
+            max-width: 600px; /* Increased width */
+            margin: 40px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 4px solid #F8B21A;
+        }
+
+        /* Styling for the predicted rate (top part) */
+        .overall-retention-container .predicted-rate {
+            font-size: 4rem;
+            color: #F8B21A;
+            margin-bottom: 20px;
+        }
+
+        /* Subtext below predicted rate */
+        .overall-retention-container .subtext {
+            color: #F8B21A;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        /* Bottom half with two columns */
+        .overall-retention-container .rates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.0rem;
+            padding: 20px 50px; /* Adds padding for better alignment */
+        }
+
+        .overall-retention-container .rates .real-rate {
+            color: #f1f1f1;
+        }
+
+        .overall-retention-container .rates .error-rate {
+            color: #ff5757;
+        }
+
+        /* Course Summary Container Styling */
+        .course-summary {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;  /* Added gap between course boxes */
+        }
+
+        .course-box {
+            background: #F8B21A;
+            color: #484848;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            width: 350px; /* Increased width */
+            height: 280px; /* Increased height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid #484848;
+            font-weight: bold;
+        }
+
+        .course-box .predicted {
+            font-size: 2.8rem; /* Adjusted font size */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .course-box .subtext {
+            font-size: 1.0rem;
+            margin-bottom: 20px;
+
+        }
+
+        .course-box .real-and-distribution {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            padding: 0 10px;
+        }
+
+        .course-box .real-retention {
+            color: #484848;
+        }
+
+        .course-box .distribution {
+            color: #ff5757;
+        }
+
+        .real-retention {
+            text-align: left;
+        }
+
+        .distribution {
+            text-align: right;
+        }
+
+        .grey-text-predicted {
+            color: #f1f1f1;
+            font-size: 1.8rem;
+        }
+
+        /* Chart container styles */
+        .chart-container {
+            flex: 1 1 calc(50% - 20px);
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        h2 {
+            margin: 40px 0;
+            margin-top: 70px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1400px) {
+            .chart-container {
+                flex: 1 1 100%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .chart-container {
+                flex: 1 1 100%;
+            }
+        }
+
+        #input {
+            color: white;
+            background-image: url("{{ url_for('static', filename='img/homebg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 50vh;
+            display: flex;
+            align-items: center;
+        }
+
+        #input .btn {
+            background-color: #f8b21a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        #input .dl_sample {
+            background-color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Custom styles for course retention summary */
+        .course-summary {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .info-symbol {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #007BFF;
+            border: 1px solid #007BFF;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            vertical-align: top;
+        }
+
+        /* Tooltip container styling */
+        .info-symbol .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Positioning the tooltip above the symbol */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Tooltip arrow */
+        .info-symbol .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        /* Show the tooltip on hover */
+        .info-symbol:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Chart container styles */
+        .chart-container {
+            flex: 1 1 calc(50% - 20px);
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #general-data-section {
+            margin-top: 150px; /* Adjust based on the actual height of the navbar */
+        }
+
+        .white-bg-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+.positive-container {
+    background-color: #FF9999;
+    padding: 20px;
+    border-radius: 10px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.neutral-container {
+    background-color: #CCF2FF;
+    padding: 20px;
+    border-radius: 10px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.negative-container {
+    background-color: #99CCFF;
+    padding: 20px;
+    border-radius: 10px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+ul.list-unstyled {
+    line-height: 1.8;
+}
+    </style>
+</head>
+<body>
+    <!-- Nav Bar Section -->
+    <section id="nav-bar">
+        <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
+            <div class="container">
+                <a href="/" class="navbar-brand mb-0 h1">
+                    <img
+                        class="d-inline-block align-top"
+                        src="{{ url_for('static', filename='img/logo.png') }}"
+                        width="30"
+                        height="50"
+                        alt="Logo"
+                    />
+                </a>
+
+                <button
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                class="navbar-toggler"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                >
+                <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Collapsible menu -->
+                <div>
+                    <button class="btn btn-outline-secondary ms-3" onclick="captureResults()">
+                        Download Metrics
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </section>
+
+<div id="results-section">
+    <section id="general-data-section" class="container">
+
+        <h2 class="text-center">General Data</h2>
+        <div class="row">
+            <!-- Retention Rate by Course -->
+            <div class="col-lg-6 col-md-12 chart-container">
+                <div class="chart">
+                    <h2>Retention Rate by Course
+                        <span class="info-symbol">i
+                            <div class="tooltip">This chart shows the retention rate by course over a specific period.</div>
+                        </span>
+                    </h2>
+                    <img src="data:image/png;base64,{{ retention_by_course }}" alt="Retention Rate by Course">
+                </div>
+            </div>
+
+            <!-- Accuracy Rate of Retention Prediction by Course -->
+            <div class="col-lg-6 col-md-12 chart-container">
+                <div class="chart">
+                    <h2>Retention Prediction Accuracy
+                        <span class="info-symbol">i
+                            <div class="tooltip">This chart displays the accuracy of the retention prediction by course.</div>
+                        </span>
+                    </h2>
+                    <img src="data:image/png;base64,{{ accuracy_by_course }}" alt="Accuracy Rate of Retention Prediction by Course">
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="text-center">Features</h2>
+        <div class="row">
+            <!-- Feature Importance -->
+            <div class="col-lg-6 col-md-12 chart-container">
+                <div class="chart">
+                    <h2>Feature Importance
+                        <span class="info-symbol">i
+                            <div class="tooltip">This chart ranks the importance of features used in the model prediction.</div>
+                        </span>
+                    </h2>
+                    <img src="data:image/png;base64,{{ feature_importance }}" alt="Feature Importance">
+                </div>
+            </div>
+
+            <!-- Heatmap -->
+            <div class="col-lg-6 col-md-12 chart-container">
+                <div class="chart">
+                    <h2>Feature Correlation (Heatmap)
+                        <span class="info-symbol">i
+                            <div class="tooltip">This heatmap shows the correlation between different features. Positive correlations are shown in red, while negative correlations are in blue. The color intensity indicates the strength of the correlation, where 1 represents a perfect positive correlation and -1 represents a perfect negative correlation.</div>
+                        </span>
+                    </h2>
+                    <img src="data:image/png;base64,{{ correlation_heatmap }}" alt="Heatmap (Feature Correlation)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Interpretation Section -->
+        <h2 class="text-center">Heatmap Interpretation</h2>
+
+        <div class="container white-bg-container" style="background-color: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h2 class="text-center">Categorized Correlations</h2>
+            <div class="row justify-content-center">
+                <!-- Positive Correlations (Pastel Red) -->
+                <div class="col-lg-4 col-md-4">
+                    <div class="positive-container" style="background-color: #FF9999; padding: 20px; border-radius: 10px; text-align: center; height: 400px; overflow-y: scroll;">
+                        <h3 style="font-size: 2rem; font-weight: bold;">Positive Correlations (>= 0.10)</h3><br>
+                        <ul class="list-unstyled" style="line-height: 1.8;">
+                            {% for item in positive_correlations %}
+                                {% if loop.index0 < 3 %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% else %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Neutral Correlations (Pastel Light Blue) -->
+                <div class="col-lg-4 col-md-4">
+                    <div class="neutral-container" style="background-color: #CCF2FF; padding: 20px; border-radius: 10px; text-align: center; height: 400px; overflow-y: scroll;">
+                        <h3 style="font-size: 2rem; font-weight: bold;">Neutral Correlations <br>(-0.10 < correlation < 0.10)</h3><br>
+                        <ul class="list-unstyled" style="line-height: 1.8;">
+                            {% for item in neutral_correlations %}
+                                {% if loop.index0 < 3 %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% else %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Negative Correlations (Pastel Blue) -->
+                <div class="col-lg-4 col-md-4">
+                    <div class="negative-container" style="background-color: #99CCFF; padding: 20px; border-radius: 10px; text-align: center; height: 400px; overflow-y: scroll;">
+                        <h3 style="font-size: 2rem; font-weight: bold;">Negative Correlations (<= -0.10)</h3><br>
+                        <ul class="list-unstyled" style="line-height: 1.8;">
+                            {% for item in negative_correlations %}
+                                {% if loop.index0 < 3 %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% else %}
+                                    <li style="font-size: 1.4rem;">{{ item[0] }} and {{ item[1] }}: {{ item[2] | round(2) }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-center">Verbal Interpretation</h2>
+
+                <div class="row justify-content-center">
+                    <!-- Positive Interpretation -->
+                    <div class="col-lg-4 col-md-4">
+                        <div class="positive-container">
+                            <h3>Positive Correlations Interpretation</h3>
+                            <ul class="list-unstyled">
+                                {% for interpretation in positive_interpretations[:5] %}
+                                    <li>{{ interpretation }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Neutral Interpretation -->
+                    <div class="col-lg-4 col-md-4">
+                        <div class="neutral-container">
+                            <h3>Neutral Correlations Interpretation</h3>
+                            <ul class="list-unstyled">
+                                {% for interpretation in neutral_interpretations[:5] %}
+                                    <li>{{ interpretation }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Negative Interpretation -->
+                    <div class="col-lg-4 col-md-4">
+                        <div class="negative-container">
+                            <h3>Negative Correlations Interpretation</h3>
+                            <ul class="list-unstyled">
+                                {% for interpretation in negative_interpretations[:5] %}
+                                    <li>{{ interpretation }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+</div>
+    <!-- Input Section -->
+    <section id="input" class="py-5 bg-light">
+        <div class="container d-flex align-items-center justify-content-center" style="height: 300px;">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h2>Upload your Data</h2>
+                    <form method="POST" action="/" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Choose an Excel file:</label>
+                            <input type="file" class="form-control" id="fileInput" name="file" accept=".xlsx" required />
+                        </div>
+                        <a
+                            href="{{ url_for('download_file', filename='download_sample_file.xlsx') }}"
+                            class="btn bg-dark bg-opacity-75 dl_sample"
+                        >Download sample .xlsx</a>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Saving User Progress -->
+    <script>
+      function saveProgress() {
+          const formData = new FormData(document.getElementById('file-upload-form'));
+      
+          // Send the data to the server for autosaving
+          fetch('/save_progress', {
+              method: 'POST',
+              body: formData,
+          }).then(response => response.json())
+          .then(data => {
+              console.log('Progress saved:', data);
+          });
+      }
+      
+      // Save progress every 30 seconds
+      setInterval(saveProgress, 30000);  // 30-second interval
+    </script>
+
+    <!-- HTML2Canvas Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function captureResults() {
+            html2canvas(document.getElementById('results-section')).then(function(canvas) {
+                var link = document.createElement('a');
+                link.href = canvas.toDataURL();
+                link.download = 'Metrics.png';
+                link.click();
+            });
+        }
+    </script>
+
+    <!-- Bootstrap JS and dependencies (Optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Registration</title>
+    <link rel="stylesheet" href="static/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 15px;
+  background-image: url("{{ url_for('static', filename='img/homebg.jpg') }}");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+}
+.wrapper {
+  max-width: 500px;
+  width: 100%;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
+}
+.wrapper .title {
+  height: 120px;
+  background-color: #484848;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wrapper form {
+  padding: 25px 35px;
+}
+.wrapper form .row {
+  height: 60px;
+  margin-top: 15px;
+  position: relative;
+}
+.wrapper form .row input {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding-left: 70px;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+form .row input::placeholder {
+  color: #999;
+}
+.wrapper form .row i {
+  position: absolute;
+  width: 55px;
+  height: 100%;
+  color: #fff;
+  font-size: 22px;
+  background-color: #484848;
+  border: 1px solid #16a085;
+  border-radius: 5px 0 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wrapper form .pass {
+  margin-top: 12px;
+}
+.wrapper form .pass a {
+  background-color: #484848;
+  font-size: 17px;
+  text-decoration: none;
+}
+.wrapper form .pass a:hover {
+  text-decoration: underline;
+}
+.wrapper form .button input {
+  margin-top: 20px;
+  margin-bottom: 15px; /* Add margin at the bottom */
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  padding-left: 0px;
+  background-color: #484848;
+  border: 1px solid #16a085;
+  cursor: pointer;
+}
+.toggle-link {
+  margin-top: 50px;
+  text-align: center;
+}
+.toggle-link a {
+  color: #484848;
+  font-size: 17px;
+  text-decoration: none;
+}
+.toggle-link a:hover {
+  text-decoration: underline;
+}
+
+#submit-button {
+  margin-bottom: 10px;
+}
+
+.alert-container {
+  margin-bottom: 15px;
+}
+.alert {
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  text-align: center;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+</style>
+</head>
+<body>
+  {% if session.email %}
+  <div class="wrapper" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; background-color: #cd982f;">
+      <h2>Logged in</h2>
+      <p>Welcome, {{ session.email }}</p>
+      <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+  {% else %}
+      <div class="wrapper">
+          <div class="title"><span id="form-title">Login Form</span></div>
+
+          <!-- Flash messages block placed inside the wrapper -->
+          <div class="alert-container">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+          </div>
+
+          <form method="POST" action="{{ url_for('login') }}" id="auth-form">
+              <div class="row">
+                  <i class="fas fa-user"></i>
+                  <input type="text" name="email" id="email" placeholder="Email" required />
+              </div>
+              <div class="row">
+                  <i class="fas fa-lock"></i>
+                  <input type="password" name="password" id="password" placeholder="Password" required />
+              </div>
+              <div class="row button">
+                  <input type="submit" value="Login" id="submit-button" />
+              </div>
+              <div class="toggle-link">
+                  <a href="#" id="toggle-link">Don't have an account? Register</a>
+              </div>
+          </form>
+      </div>
+  {% endif %}
+  <script>
+      document.getElementById('toggle-link').addEventListener('click', function (e) {
+          e.preventDefault();
+          const formTitle = document.getElementById('form-title');
+          const submitButton = document.getElementById('submit-button');
+          const toggleLink = document.getElementById('toggle-link');
+          const authForm = document.getElementById('auth-form');
+          
+          if (formTitle.innerText === 'Login Form') {
+              formTitle.innerText = 'Registration Form';
+              submitButton.value = 'Register';
+              authForm.action = "{{ url_for('register') }}";
+              toggleLink.innerText = 'Already have an account? Login';
+          } else {
+              formTitle.innerText = 'Login Form';
+              submitButton.value = 'Login';
+              authForm.action = "{{ url_for('login') }}";
+              toggleLink.innerText = "Don't have an account? Register";
+          }
+      });
+  </script>
+</body>
+</html>
