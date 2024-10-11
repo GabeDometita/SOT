@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li a:hover {
+  background: #d3d1cd;
+  color: white;
+}
+
+#get-started-btn {
+  background-color: #f8b21a;
+  border-color: beige;
+}
+
+/* Home Section */
+#home {
+  background-image: url('assets/img/hero-1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: rgb(0, 0, 0);
+  position: relative;
+  z-index: 1;
+}
+
+#home h1 {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+#home p {
+  font-size: 1.25rem;
+}
+
+#home .btn {
+  background-color: #f8b21a;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+/*Input Section*/
+
+#input .btn {
+  background-color: #f8b21a;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+#input .dl_sample {
+  background-color: #000000;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+
+
+
+/* Features Section */
+#features {
+  margin: 30px;
+}
+
+#features img {
+  margin: 30px;
+}
+
+/* Commands Section */
+#commands {
+  margin-top: 30px;
+
+}
+
+
+
+#commands p {
+  text-align: center;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 10;
+  padding: 0.3rem 0.75rem;
+}
+
+pre {
+  border-radius: 5px;
+  position: relative;
+}
+
+#developers {
+  margin-top: 30px;
+}
+
